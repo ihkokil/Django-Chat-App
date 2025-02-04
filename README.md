@@ -104,7 +104,7 @@ This project is free to use for educational purposes. The source code is provide
 
 ## Acknowledgments
 
-- Developed by **ihkokil**.
+- Developed by **Md. Iqbal Haider Khan**.
 - Submitted on **February 2, 2025**.
 
 ---
