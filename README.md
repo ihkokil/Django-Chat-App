@@ -1,5 +1,7 @@
 # Simple Chat System using Django
 
+![Python](https://img.shields.io/badge/Python-3.9.1-blue) ![Django](https://img.shields.io/badge/Django-3.2.3-green) ![License](https://img.shields.io/badge/License-Free%20for%20Educational%20Use-orange)
+
 A simple chat web application built using Python and Django. This project demonstrates the basic functionality of a chat system, including user authentication, real-time messaging, and user management. It is designed to help new programmers understand how to implement a chat system using Django.
 
 ---
