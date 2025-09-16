@@ -39,7 +39,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 1.  **Clone the repository:**
     ```sh
-    git clone [https://github.com/ihkokil/Django-Chat-App.git](https://github.com/ihkokil/Django-Chat-App.git)
+    git clone https://github.com/ihkokil/Django-Chat-App.git
     cd Django-Chat-App
     ```
 
@@ -88,4 +88,4 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## Connect with me
 
-<img src='https://cdn.jsdelivr.net/npm/simple-icons@3.0.1/icons/linkedin.svg' alt='linkedin' height='40'>(https://www.linkedin.com/in/ihkokil/)
+![<img src='https://cdn.jsdelivr.net/npm/simple-icons@3.0.1/icons/linkedin.svg' alt='linkedin' height='40'>](https://www.linkedin.com/in/ihkokil/)
