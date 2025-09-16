@@ -1,60 +1,118 @@
+<!-- ./chat/templates/chat/base.html -->
 <!DOCTYPE html>
 <html lang="en">
-{% load static %}
-<style>
-    html,
-    body {
-        height: 100%;
-        width: 100%;
-    }
-</style>
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App using Django</title>
-
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'fontawesome-free/css/all.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
-    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
-    <script src="{% static 'js/popper.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/script.js' %}"></script>
-
-    {% block header %} {% endblock header %}
+    <title>Chat App</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% block extra_css %}{% endblock %}
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .list-group-item:hover {
+            background-color: #e9ecef;
+        }
+        .chat-bubble {
+            border-radius: 18px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+        .sent {
+            background-color: #0d6efd;
+            color: white;
+            margin-left: auto;
+        }
+        .received {
+            background-color: #e9ecef;
+            color: black;
+            margin-right: auto;
+        }
+        .chat-container {
+            height: 75vh;
+        }
+        .chat-box {
+            height: calc(100% - 80px);
+            overflow-y: auto;
+            padding: 15px;
+        }
+        .chat-input {
+            height: 80px;
+        }
+        .user-list {
+            height: 100%;
+            overflow-y: auto;
+        }
+    </style>
 </head>
+<body>
 
-<body class='bg-dark text-light'>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary w-100 border-bottom border-primary mb-2" id="top-nav">
-        <a class="navbar-brand" href="{% url 'chat-home' %}">Chat App</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-menu" aria-controls="nav-menu" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-        <div class="collapse navbar-collapse" id="nav-menu">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item {% if page == 'home' %} active {% endif %}">
-                    <a class="nav-link" href="{% url 'chat-home' %}"><i class="fa fa-home"></i> Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'chat-logout' %}"><i class="fa fa-sign-out-alt"></i> Logout</a>
-                </li>
-            </ul>
-            {% if user.is_authenticated %}
-            <span><a class="text-light"  href="{% url 'chat-profile' %}"><i class="fa fa-user"></i> <b>Welcome {{user.first_name}}!</b></a></span> {% endif %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'chat-home' %}"><i class="fas fa-comments me-2"></i>Chat App</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'chat-home' %}"><i class="fas fa-home me-1"></i>Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'chat-profile' %}"><i class="fas fa-user me-1"></i>Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="{% url 'chat-logout' %}"><i class="fas fa-sign-out-alt me-1"></i>Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'chat-login' %}"><i class="fas fa-sign-in-alt me-1"></i>Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'chat-register' %}"><i class="fas fa-user-plus me-1"></i>Register</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                {% if user.is_authenticated %}
+                <span class="navbar-text ms-3 text-white">
+                    <i class="fas fa-user-circle me-1"></i> Welcome, {{ user.first_name|default:user.username }}!
+                </span>
+                {% endif %}
+            </div>
         </div>
-
     </nav>
-    <div class="container h-100">
-        {% block content %}{% endblock content %}
-    </div>
-</body>
-<script>
-    $(function() {
-        $('div.dataTables_length select').addClass('bg-dark')
-    })
-</script>
-{% block footer %}{% endblock footer %}
 
+    <div class="container mt-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
 </html>

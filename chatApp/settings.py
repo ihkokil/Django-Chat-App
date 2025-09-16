@@ -1,3 +1,4 @@
+# ./chatApp/settings.py
 """
 Django settings for chatApp project.
 
@@ -11,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +22,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-vd!#re9-@xrh-n&h7b#a(+0v5oxf-q!os!ot3#!$l@*952p5t3'
+# TODO: Move to environment variable for production
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-vd!#re9-@xrh-n&h7b#a(+0v5oxf-q!os!ot3#!$l@*952p5t3')
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# Set to False in production
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# Update for your production domain(s)
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -33,12 +38,13 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
-    'crispy_forms',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'chat.apps.ChatConfig',
+    'crispy_forms',
+    'crispy_bootstrap5', # Use Bootstrap 5 crispy pack
+    'chat', # Register the chat app
 ]
 
 MIDDLEWARE = [
@@ -56,7 +62,7 @@ ROOT_URLCONF = 'chatApp.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'], # Add global templates directory
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -120,15 +126,33 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # For collectstatic in production
 STATICFILES_DIRS = (
-    # location of your application, should not be public web accessible 
-    './static',
+    BASE_DIR / 'static', # Local static files directory
 )
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
+# Crispy Forms settings for Bootstrap 5
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
+
+# Authentication settings
 LOGIN_REDIRECT_URL = "chat-home"
+LOGOUT_REDIRECT_URL = "chat-login" # Fix logout redirect
 LOGIN_URL = "chat-login"
+
+# --- Production Security Settings (Uncomment and configure for production) ---
+# SECURE_BROWSER_XSS_FILTER = True
+# SECURE_CONTENT_TYPE_NOSNIFF = True
+# X_FRAME_OPTIONS = 'DENY'
+# SECURE_HSTS_SECONDS = 31536000
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_HSTS_PRELOAD = True
+# SECURE_SSL_REDIRECT = True # Only if using HTTPS
+# SESSION_COOKIE_SECURE = True # Only if using HTTPS
+# CSRF_COOKIE_SECURE = True # Only if using HTTPS
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') # If behind proxy like Nginx

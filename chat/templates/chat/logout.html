@@ -1,42 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-{% load static %} {% load crispy_forms_tags %}
-<style>
-    html,
-    body {
-        height: 100%;
-        width: 100%;
-    }
-</style>
+<!-- ./chat/templates/chat/logout.html -->
+{% extends 'chat/base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App using Django</title>
-
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'fontawesome-free/css/all.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
-    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
-    <script src="{% static 'js/popper.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-
-</head>
-
-<body class='bg-dark text-light'>
-    <div class="container h-100 d-flex flex-column justify-content-center">
-        <div class="col-md-6 offset-md-3">
-            <div class="card bg-dark card-outline-primary">
-                <div class="card-body">
-                    <h2>Successfully Logout</h2>
-                    <a href="{% url 'chat-login' %}">Login Again</a>
-                </div>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4 text-center">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                <h4 class="card-title">You have been logged out.</h4>
+                <p class="card-text">Thank you for using the Chat App.</p>
+                <a href="{% url 'chat-login' %}" class="btn btn-primary">Log In Again</a>
             </div>
         </div>
     </div>
-</body>
-<script>
-    $(function() {})
-</script>
-
-</html>
+</div>
+{% endblock %}

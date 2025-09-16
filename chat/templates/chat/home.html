@@ -1,178 +1,269 @@
-{% extends 'chat/base.html' %} {% load static %} {% block header %}
+<!-- ./chat/templates/chat/home.html -->
+{% extends 'chat/base.html' %}
+{% load static %}
+
+{% block extra_css %}
 <style>
-    #user-list a.bg-dark {
-        background-color: rgb(107, 107, 107) !important;
+    #chat-box {
+        display: flex;
+        flex-direction: column;
     }
-    
-    .list-group-item {
-        cursor: pointer
+    .chat-messages {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 15px;
     }
-    
-    .chat-bubble {
-        min-width: 40%;
-        max-width: 80%;
-        padding: 5px 15px;
-    }
-    
-    #user-list a:hover * {
-        text-decoration: unset;
-    }
-    
-    .chat-box {
-        overflow: auto;
-        max-width: 100%;
+    .chat-input-form {
+        flex-shrink: 0;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-top: 1px solid #dee2e6;
     }
 </style>
-{% endblock %} {% block content %}
-<div class="container" style="height: 75%;">
-    <div class="card bg-dark h-100 border-light">
-        <div class="card-body h-100">
-            <div class="row h-100">
-                <div class="col-md-4 border-right h-100">
-                    <div class="list-group bg-dark" id='user-list'>
-                        {% for u in users %} {% if not u.id == 1 and not u.id == user.id %}
-                        <a class="list-group-item {% if u.id != chat_id %}bg-dark{% else %}bg-primary{% endif %} text-white" href="{% url 'chat-home' %}?u={{u.id}}">
-                            <div>
-                                <p>{{u.first_name}} {{u.last_name}} ({{u.username}})</p>
+{% endblock %}
+
+{% block content %}
+<div class="card chat-container shadow-sm">
+    <div class="card-body h-100 p-0">
+        <div class="row g-0 h-100">
+            <!-- User List Column -->
+            <div class="col-md-4 border-end">
+                <div class="p-3 border-bottom bg-light">
+                    <h5 class="mb-0">Users</h5>
+                </div>
+                <div class="list-group list-group-flush user-list" id="user-list">
+                    {% for u in users %}
+                        {% if u.id != request.user.id and u.id != 1 %} <!-- Exclude admin (id=1) and self -->
+                        <a href="{% url 'chat-home' %}?u={{ u.id }}"
+                           class="list-group-item list-group-item-action {% if u.id == chat_id %}active bg-primary text-white border-primary{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <!-- Simple user icon, consider Gravatar or user avatars later -->
+                                    <i class="fas fa-user-circle fa-2x text-muted"></i>
+                                </div>
+                                <div>
+                                    <!-- Display full name if available, otherwise username -->
+                                    <div class="fw-bold">{{ u.get_full_name|default:u.username }}</div>
+                                    <!-- Show username in smaller text -->
+                                    <small class="text-muted">@{{ u.username }}</small>
+                                </div>
                             </div>
                         </a>
-                        {% endif %} {% endfor %}
-                    </div>
+                        {% endif %}
+                    {% empty %}
+                        <div class="list-group-item text-muted">No other users found.</div>
+                    {% endfor %}
                 </div>
-                <div class="col-md-8 h-100">
-                    {% if not chat_id > 0 %}
-                    <div class="h-100 d-flex flex-column justify-content-center align-items-center">
-                        <h3>Start Chat now</h3>
-                        <p><small class="text-muted">Please select a person to chat with.</small></p>
+            </div>
+
+            <!-- Chat Box Column -->
+            <div class="col-md-8 d-flex flex-column">
+                <!-- Display Chat Partner Name using the selected_user object -->
+                {% if chat_id > 0 and selected_user %}
+                    <div class="p-3 border-bottom bg-light">
+                        <h5 class="mb-0">Chat with {{ selected_user.get_full_name|default:selected_user.username }}</h5>
                     </div>
-                    {% else%}
-                    <div id="chat-box-field" class="h-100">
-                        <div class="chat-box" style="height:80%">
-                            {% for chat in chats %} {% if chat.user_from == user %}
-                            <div class="p-2 w-100 d-flex justify-content-end">
-                                <div class=" chat-bubble  ml-2 mb-2 bg-primary text-light rounded" data-id="{{chat.id}}">
-                                    <p>{{chat.message}}</p>
-                                    <div class="d-flex justify-content-between"><small>You</small> <small>{{chat.date_created|date:"M-d-Y H:i"}}</small></div>
-                                </div>
-                            </div>
-                            {% else %}
-                            <div class="p-2 w-100 d-flex justify-content-start">
-                                <div class="chat-bubble mr-2 mb-2 bg-light text-dark rounded" data-id="{{chat.id}}">
-                                    <p>{{chat.message}}</p>
-                                    <div class=" d-flex justify-content-between"><small>Sender</small> <small>{{chat.date_created|date:"M-d-Y H:i"}}</small></div>
-                                </div>
-                            </div>
-                            {% endif %} {% endfor %}
-                        </div>
-                        <div class="chat-box-form border-top p-2" style="height:20%">
-                            <div class="w-100 h-100">
-                                <form action="" id="chat-submit" class="h-100 d-flex ">
-                                    <input type="hidden" name="user_from" value="{{ user.id }}">
-                                    <input type="hidden" name="user_to" value="{{ chat_id }}">
-                                    <div class="col-md-10 h-100">
-                                        <textarea name="message" id="" class="h-100 w-100 form-control" placeholder="Write your message here"></textarea>
+                {% endif %}
+
+                {% if chat_id > 0 %}
+                <div id="chat-box" class="d-flex flex-column h-100">
+                    <!-- Messages Area -->
+                    <div class="chat-messages" id="chat-messages-container">
+                        {% for chat in chats %}
+                            {% if chat.user_from == request.user %}
+                                <div class="d-flex justify-content-end mb-2">
+                                    <div class="chat-bubble sent" data-id="{{ chat.id }}"> <!-- Add data-id -->
+                                        <div>{{ chat.message|linebreaksbr }}</div> <!-- linebreaksbr for newlines -->
+                                        <div class="text-end"><small>{{ chat.date_created|date:"M-d-Y H:i" }}</small></div>
                                     </div>
-                                    <button class="button btn btn-primary h-100 w-100 justify-content-center align-items-center d-flex">SEND</button>
-                                </form>
+                                </div>
+                            {% else %}
+                                <div class="d-flex justify-content-start mb-2">
+                                    <div class="chat-bubble received" data-id="{{ chat.id }}"> <!-- Add data-id -->
+                                        <div>{{ chat.message|linebreaksbr }}</div> <!-- linebreaksbr for newlines -->
+                                        <div class="text-end"><small>{{ chat.date_created|date:"M-d-Y H:i" }}</small></div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% empty %}
+                            <div class="text-center text-muted mt-5">
+                                <i class="fas fa-comment-slash fa-3x mb-3"></i>
+                                <p>No messages yet. Start the conversation!</p>
                             </div>
-                        </div>
+                        {% endfor %}
                     </div>
-                    {% endif %}
+
+                    <!-- Input Area -->
+                    <div class="chat-input-form">
+                        <form id="chat-form" class="d-flex">
+                            {% csrf_token %}
+                            <input type="hidden" name="user_from" value="{{ request.user.id }}">
+                            <input type="hidden" name="user_to" value="{{ chat_id }}">
+                            <div class="flex-grow-1 me-2">
+                                <textarea name="message" id="message-input" class="form-control" rows="2" placeholder="Type your message..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="send-button"><i class="fas fa-paper-plane"></i></button>
+                        </form>
+                    </div>
                 </div>
+                {% else %}
+                <!-- Welcome/Select User Message -->
+                <div class="d-flex align-items-center justify-content-center h-100 text-center p-4">
+                    <div>
+                        <i class="fas fa-hand-wave fa-3x text-primary mb-3"></i> <!-- Welcome icon -->
+                        <h4>Welcome to the Chat App!</h4>
+                        <p class="text-muted">Select a user from the list to start chatting.</p>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
-{% endblock %} {% block footer %}
+{% endblock %}
+
+{% block extra_js %}
 <script>
-    $(function() {
-        if ($('.chat-bubble:last').length > 0) {
-            $('.chat-box').animate({
-                scrollTop: $('.chat-bubble:last').offset().top
-            }, 'fast')
+    $(document).ready(function() {
+        // --- Chat Message Handling ---
+        const chatBox = $('#chat-messages-container');
+
+        // Function to scroll chat box to the bottom
+        function scrollToBottom() {
+            chatBox.scrollTop(chatBox[0].scrollHeight);
         }
-        $('#chat-submit').submit(function(e) {
-            e.preventDefault()
-            start_loader()
+
+        // Initial scroll to bottom on page load
+        scrollToBottom();
+
+        // --- Send Message ---
+        $('#chat-form').submit(function(e) {
+            e.preventDefault();
+            const messageInput = $('#message-input');
+            const message = messageInput.val().trim();
+
+            if (message === '') {
+                alert('Please enter a message.');
+                return;
+            }
+
+            const formData = $(this).serialize();
+
             $.ajax({
-                headers: {
-                    "X-CSRFToken": '{{csrf_token}}'
+                url: '{% url "chat-send" %}',
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                beforeSend: function(xhr, settings) {
+                     xhr.setRequestHeader("X-CSRFToken", $('[name=csrfmiddlewaretoken]').val());
                 },
-                url: "{% url 'chat-send' %}",
-                method: "POST",
-                data: $(this).serialize(),
-                dataType: "json",
-                error: err => {
-                    console.log(err)
-                    alert('an error occured')
-                },
-                success: function(resp) {
-                    if (typeof resp == "object" && resp.status == 'success') {
-                        location.reload()
+                success: function(response) {
+                    if (response.status === 'success') {
+                        // Clear input field after successful send
+                        messageInput.val('');
+                        // Optionally fetch new messages immediately or let polling handle it
+                        // fetchNewMessages(); // Uncomment if you want instant refresh
                     } else {
-                        consol.log(resp)
-                        alert('an error occured')
+                        console.error('Send error:', response);
+                        alert('Failed to send message: ' + (response.message || 'Unknown error'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error (Send):', status, error);
+                    alert('An error occurred while sending the message.');
+                }
+            });
+        });
+
+        // --- Polling for New Messages ---
+        let lastMessageId = 0;
+        // Get the ID of the last message currently displayed
+        if (chatBox.children().length > 0) {
+             lastMessageId = chatBox.children().last().find('.chat-bubble').data('id') || 0;
+        }
+
+        function fetchNewMessages() {
+            // Only poll if we are in a chat (chat_id > 0)
+            if ({{ chat_id|default:0 }} <= 0) {
+                 return;
+            }
+
+            const currentLastId = lastMessageId; // Capture the value for this request
+
+            $.ajax({
+                url: '{% url "chat-renew" %}', // URL for the renew view
+                type: 'POST',
+                data: {
+                    'last_id': currentLastId, // Send the last known message ID
+                    'chat_id': {{ chat_id|default:0 }}, // Send the current chat partner ID
+                    'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val() // CSRF token
+                },
+                dataType: 'json',
+                timeout: 5000, // Set a timeout for the request (5 seconds)
+                success: function(newMessages) {
+                    // Check if new messages were received
+                    if (newMessages.length > 0) {
+                        let messagesHtml = '';
+                        // Iterate through the new messages
+                        newMessages.forEach(function(msg) {
+                            let bubbleClass, alignClass;
+                            // Determine if the message was sent by the current user
+                            if (msg.user_from == {{ request.user.id }}) {
+                                bubbleClass = 'sent';
+                                alignClass = 'justify-content-end';
+                            } else {
+                                bubbleClass = 'received';
+                                alignClass = 'justify-content-start';
+                            }
+                            // Construct the HTML for the new chat bubble
+                            messagesHtml += `
+                                <div class="d-flex ${alignClass} mb-2">
+                                    <div class="chat-bubble ${bubbleClass}" data-id="${msg.id}">
+                                        <div>${msg.message}</div>
+                                        <div class="text-end"><small>${msg.date_created}</small></div>
+                                    </div>
+                                </div>
+                            `;
+                            // Update the lastMessageId to the highest ID seen
+                            if (msg.id > lastMessageId) {
+                                 lastMessageId = msg.id;
+                            }
+                        });
+                        // Append the new messages to the chat container
+                        $('#chat-messages-container').append(messagesHtml);
+                        // Scroll to the bottom only if the user is already near the bottom
+                        // This prevents jumping if the user is reading older messages
+                        const isScrolledToBottom = chatBox[0].scrollHeight - chatBox[0].clientHeight <= chatBox.scrollTop() + 10; // Small buffer
+                        if(isScrolledToBottom) {
+                             scrollToBottom();
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Handle errors silently or with less intrusive logging
+                    // This prevents console spam when there are no new messages (404s, timeouts)
+                    if (status !== 'timeout' && xhr.status !== 404) {
+                         console.log('Polling error (might be normal):', status, error);
                     }
                 }
-            })
+            });
+        }
 
+        // Start polling for new messages every 2.5 seconds
+        const pollingInterval = setInterval(fetchNewMessages, 2500);
 
+        // Clear the polling interval when the window is about to unload
+        // (e.g., user navigates away or closes the tab)
+        $(window).on('beforeunload', function() {
+            clearInterval(pollingInterval);
+        });
 
-        })
-        chats_renew()
-        setInterval(() => {
-            chats_renew()
-        }, 2500)
+        // Optional: Stop polling if navigating away via specific links (like logout)
+        // You might need more sophisticated logic for SPA-like behavior
+        // $('a[href*="logout"]').on('click', function() {
+        //     clearInterval(pollingInterval);
+        // });
 
-    })
-
-    function chats_renew() {
-        var last_id = 0
-        if ($('.chat-bubble').length > 0)
-            last_id = $('.chat-bubble:last').attr('data-id')
-        $.ajax({
-            headers: {
-                "X-CSRFToken": '{{csrf_token}}'
-            },
-            url: "{% url 'chat-renew' %}",
-            method: "POST",
-            data: {
-                last_id: last_id,
-                user_id: '{{user.id}}',
-                chat_id: '{{chat_id}}'
-            },
-            dataType: 'json',
-            error: err => {
-                console.log(err)
-                    // alert('an error occured')
-            },
-            success: function(resp) {
-                if (Object.keys(resp).length > 0) {
-                    Object.keys(resp).map(k => {
-                        if (resp[k].id.user_from == '{{user.id}}') {
-                            bubble = '<div class="p-2 w-100 d-flex justify-content-end">' +
-                                '<div class=" chat-bubble  ml-2 mb-2 bg-primary text-light rounded" data-id="' + resp[k].id + '">' +
-                                '<p>' + resp[k].message + '</p>' +
-                                ' <div class="d-flex justify-content-between"><small>You</small> <small>' + resp[k].date_created + '</small></div>' +
-                                ' </div>' +
-                                ' </div>';
-                        } else {
-                            bubble = '<div class="p-2 w-100 d-flex justify-content-start">' +
-                                '<div class="chat-bubble mr-2 mb-2 bg-light text-dark rounded"  data-id="' + resp[k].id + '">' +
-                                ' <p>' + resp[k].message + '</p>' +
-                                ' <div class=" d-flex justify-content-between"><small>Sender</small> <small>' + resp[k].date_created + '</small></div>' +
-                                '</div>' +
-                                '</div>';
-                        }
-                        // console.log(bubble)
-                        $('.chat-box').append(bubble)
-                        $('.chat-box').animate({
-                            scrollTop: $('.chat-bubble:last').offset().top * 1000
-                        }, 'fast')
-                    })
-                }
-            }
-        })
-    }
+    });
 </script>
 {% endblock %}

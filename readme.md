@@ -1,112 +1,82 @@
-# Simple Chat System using Django
+# Django Chat App
 
-A simple chat web application built using Python and Django. This project demonstrates the basic functionality of a chat system, including user authentication, real-time messaging, and user management. It is designed to help new programmers understand how to implement a chat system using Django.
-
----
+A real-time chat application built with Django. This project includes user authentication (registration and login), private messaging, and user profile management.
 
 ## Features
 
-- **User Authentication**: Login and registration pages for user management.
-- **User List**: Displays all registered users in the chatbox.
-- **Conversation Box**: Allows users to chat with each other.
-- **Real-Time Messaging**: Automatically loads new messages in the active conversation.
-- **Profile Page**: Displays user profile information.
-- **Responsive Design**: Built with Bootstrap for a clean and responsive UI.
+* **User Authentication:** Users can create an account, log in, and log out.
+* **Private Messaging:** Logged-in users can send and receive private messages from other users.
+* **User Profiles:** Users can view and edit their profiles.
+* **Admin Panel:** An admin user can manage users and messages.
 
----
+## Screenshots
 
-## Technologies Used
+| Login Page                                     | Register Page                                      |
+| ---------------------------------------------- | -------------------------------------------------- |
+|           |            |
+| **Chat Page** | **Profile Page** |
+|  |  |
 
-- **Backend**: Python, Django
-- **Frontend**: HTML, JavaScript (jQuery, Ajax), Bootstrap
-- **Database**: SQLite
+## Getting Started
 
----
-
-## How to Run the Project
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
 
-Before running the project, ensure you have the following installed:
+* Python 3.8+
+* pip
 
-- **Python** (v3.9.1 or higher)
-- **Django** (v3.2.3 or higher)
-- **PIP** (for installing Python modules)
+### Installation and Setup
 
-### Installation Steps
+1.  **Clone the repository:**
+    ```sh
+    git clone https://github.com/ihkokil/Django-Chat-App.git
+    cd Django-Chat-App
+    ```
 
-1. **Download the Source Code**:
-   - Download and extract the provided source code zip file.
+2.  **Create and activate a virtual environment:**
+    * **On macOS and Linux:**
+        ```sh
+        python3 -m venv env
+        source env/bin/activate
+        ```
+    * **On Windows:**
+        ```sh
+        python -m venv env
+        .\env\Scripts\activate
+        ```
 
-2. **Navigate to the Project Directory**:
-   - Open your terminal or command prompt.
-   - Change the working directory to the extracted source code folder:
-     ```bash
-     cd path/to/extracted/folder
-     ```
+3.  **Install the dependencies:**
+    ```sh
+    pip install -r requirements.txt
+    ```
+    *(Note: You will need to create a `requirements.txt` file. See the section below.)*
 
-3. **Install Required Dependencies**:
-   - Run the following commands to install Django and other required libraries:
-     ```bash
-     pip install Django
-     pip install django-crispy-forms
-     ```
+4.  **Apply database migrations:**
+    ```sh
+    python manage.py migrate
+    ```
 
-4. **Set Up the Database**:
-   - Run the following command to apply migrations:
-     ```bash
-     python manage.py migrate
-     ```
+5.  **Run the development server:**
+    ```sh
+    python manage.py runserver
+    ```
+    The application will be available at http://127.0.0.1:8000/.
 
-5. **Run the Development Server**:
-   - Start the Django development server:
-     ```bash
-     python manage.py runserver
-     ```
+## Demo Credentials
 
-6. **Access the Application**:
-   - Open your web browser and navigate to:
-     ```
-     http://localhost:8000/ or http://127.0.0.1:8000/
-     ```
+### Admin User
 
----
+  * **Username:** Admin
+  * **Password:** Demo1234
 
-## Access Information
+### Demo Users
 
-### SuperUser (Admin)
-- **Username**: `admin`
-- **Password**: `admin123`
+1.    * **Username:** iqbal
+      * **Password:** Demo1234
+2.    * **Username:** khan
+      * **Password:** Demo1234
 
-### Sample User 1
-- **Username**: `jsmith`
-- **Password**: `test12345`
+## Connect with me
 
-### Sample User 2
-- **Username**: `cblake`
-- **Password**: `test12345`
-
----
-
-## Notes
-
-- This project is for **educational purposes only**.
-- Feel free to modify and extend the source code as needed.
-- If you encounter any missing modules, install them using `pip`.
-
----
-
-## License
-
-This project is free to use for educational purposes. The source code is provided as-is, without any warranties.
-
----
-
-## Acknowledgments
-
-- Developed by **Md. Iqbal Haider Khan**.
-- Submitted on **February 2, 2025**.
-
----
-
-Enjoy exploring the Simple Chat System! If you have any questions or feedback, feel free to reach out.
+[\<img src='https://cdn.jsdelivr.net/npm/simple-icons@3.0.1/icons/linkedin.svg' alt='linkedin' height='40'\>](https://www.linkedin.com/in/ihkokil/)
