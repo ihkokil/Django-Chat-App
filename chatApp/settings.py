@@ -22,15 +22,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# TODO: Move to environment variable for production
+# Use environment variable in production
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-vd!#re9-@xrh-n&h7b#a(+0v5oxf-q!os!ot3#!$l@*952p5t3')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # Set to False in production
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True' # Use environment variable
 
-# Update for your production domain(s)
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -76,15 +75,21 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'chatApp.wsgi.application'
+# ASGI_APPLICATION = 'chatApp.asgi.application' # If using ASGI
 
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
+# Use environment variables for production database settings
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.sqlite3'),
+        'NAME': os.environ.get('DB_NAME', BASE_DIR / 'db.sqlite3'),
+        # Add USER, PASSWORD, HOST, PORT for production DB (e.g., PostgreSQL)
+        # 'USER': os.environ.get('DB_USER', ''),
+        # 'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        # 'HOST': os.environ.get('DB_HOST', ''),
+        # 'PORT': os.environ.get('DB_PORT', ''),
     }
 }
 
@@ -145,7 +150,8 @@ LOGIN_REDIRECT_URL = "chat-home"
 LOGOUT_REDIRECT_URL = "chat-login" # Fix logout redirect
 LOGIN_URL = "chat-login"
 
-# --- Production Security Settings (Uncomment and configure for production) ---
+# --- Production Security Settings ---
+# Enable and configure these for production HTTPS deployment
 # SECURE_BROWSER_XSS_FILTER = True
 # SECURE_CONTENT_TYPE_NOSNIFF = True
 # X_FRAME_OPTIONS = 'DENY'
@@ -156,3 +162,20 @@ LOGIN_URL = "chat-login"
 # SESSION_COOKIE_SECURE = True # Only if using HTTPS
 # CSRF_COOKIE_SECURE = True # Only if using HTTPS
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') # If behind proxy like Nginx
+
+# Logging (Consider adding for production)
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'file': {
+#             'level': 'WARNING',
+#             'class': 'logging.FileHandler',
+#             'filename': BASE_DIR / 'django.log',
+#         },
+#     },
+#     'root': {
+#         'handlers': ['file'],
+#         'level': 'WARNING',
+#     },
+# }
