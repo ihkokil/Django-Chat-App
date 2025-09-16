@@ -1,0 +1,7 @@
+# Ignore static files from language statistics
+staticfiles/* linguist-vendored
+static/* linguist-vendored
+
+# You can also ignore other specific files or directories
+# For example, to ignore all .js files in a 'vendor' directory:
+# vendor/**/*.js linguist-vendored
