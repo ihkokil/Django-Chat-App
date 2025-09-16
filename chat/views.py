@@ -136,3 +136,4 @@ def send_chat(request):
     except Exception as e:
         # Log the error `logger.error(f"Unexpected send chat error: {e}")`
         return JsonResponse({'status': 'failed', 'message': 'An internal error occurred'}, status=500)
+# Note: In production, consider adding rate limiting and more robust error handling/logging
