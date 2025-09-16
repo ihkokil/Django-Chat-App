@@ -2,6 +2,15 @@
 
 A real-time chat application built with Django. This project includes user authentication (registration and login), private messaging, and user profile management.
 
+## Tech Stack
+
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white)
+![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
+![Bootstrap](https://img.shields.io/badge/bootstrap-%23563D7C.svg?style=for-the-badge&logo=bootstrap&logoColor=white)
+
 ## Features
 
 * **User Authentication:** Users can create an account, log in, and log out.
@@ -15,7 +24,7 @@ A real-time chat application built with Django. This project includes user authe
 | ---------------------------------------------- | -------------------------------------------------- |
 |           |            |
 | **Chat Page** | **Profile Page** |
-|  |  |
+|            |             |
 
 ## Getting Started
 
@@ -30,7 +39,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 1.  **Clone the repository:**
     ```sh
-    git clone https://github.com/ihkokil/Django-Chat-App.git
+    git clone [https://github.com/ihkokil/Django-Chat-App.git](https://github.com/ihkokil/Django-Chat-App.git)
     cd Django-Chat-App
     ```
 
@@ -50,7 +59,6 @@ These instructions will get you a copy of the project up and running on your loc
     ```sh
     pip install -r requirements.txt
     ```
-    *(Note: You will need to create a `requirements.txt` file. See the section below.)*
 
 4.  **Apply database migrations:**
     ```sh
@@ -67,16 +75,16 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Admin User
 
-  * **Username:** Admin
-  * **Password:** Demo1234
+* **Username:** Admin
+* **Password:** Demo1234
 
 ### Demo Users
 
-1.    * **Username:** iqbal
-      * **Password:** Demo1234
-2.    * **Username:** khan
-      * **Password:** Demo1234
+1.  * **Username:** iqbal
+    * **Password:** Demo1234
+2.  * **Username:** khan
+    * **Password:** Demo1234
 
 ## Connect with me
 
-[\<img src='https://cdn.jsdelivr.net/npm/simple-icons@3.0.1/icons/linkedin.svg' alt='linkedin' height='40'\>](https://www.linkedin.com/in/ihkokil/)
+[<img src='https://cdn.jsdelivr.net/npm/simple-icons@3.0.1/icons/linkedin.svg' alt='linkedin' height='40'>](https://www.linkedin.com/in/ihkokil/)
