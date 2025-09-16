@@ -33,18 +33,15 @@
                 </div>
                 <div class="list-group list-group-flush user-list" id="user-list">
                     {% for u in users %}
-                        {% if u.id != request.user.id and u.id != 1 %} <!-- Exclude admin (id=1) and self -->
+                        {% if u.id != request.user.id and u.id != 1 %}
                         <a href="{% url 'chat-home' %}?u={{ u.id }}"
                            class="list-group-item list-group-item-action {% if u.id == chat_id %}active bg-primary text-white border-primary{% endif %}">
                             <div class="d-flex align-items-center">
                                 <div class="me-3">
-                                    <!-- Simple user icon, consider Gravatar or user avatars later -->
                                     <i class="fas fa-user-circle fa-2x text-muted"></i>
                                 </div>
                                 <div>
-                                    <!-- Display full name if available, otherwise username -->
                                     <div class="fw-bold">{{ u.get_full_name|default:u.username }}</div>
-                                    <!-- Show username in smaller text -->
                                     <small class="text-muted">@{{ u.username }}</small>
                                 </div>
                             </div>
@@ -72,15 +69,15 @@
                         {% for chat in chats %}
                             {% if chat.user_from == request.user %}
                                 <div class="d-flex justify-content-end mb-2">
-                                    <div class="chat-bubble sent" data-id="{{ chat.id }}"> <!-- Add data-id -->
-                                        <div>{{ chat.message|linebreaksbr }}</div> <!-- linebreaksbr for newlines -->
+                                    <div class="chat-bubble sent" data-id="{{ chat.id }}">
+                                        <div>{{ chat.message|linebreaksbr }}</div>
                                         <div class="text-end"><small>{{ chat.date_created|date:"M-d-Y H:i" }}</small></div>
                                     </div>
                                 </div>
                             {% else %}
                                 <div class="d-flex justify-content-start mb-2">
-                                    <div class="chat-bubble received" data-id="{{ chat.id }}"> <!-- Add data-id -->
-                                        <div>{{ chat.message|linebreaksbr }}</div> <!-- linebreaksbr for newlines -->
+                                    <div class="chat-bubble received" data-id="{{ chat.id }}">
+                                        <div>{{ chat.message|linebreaksbr }}</div>
                                         <div class="text-end"><small>{{ chat.date_created|date:"M-d-Y H:i" }}</small></div>
                                     </div>
                                 </div>
@@ -110,7 +107,7 @@
                 <!-- Welcome/Select User Message -->
                 <div class="d-flex align-items-center justify-content-center h-100 text-center p-4">
                     <div>
-                        <i class="fas fa-hand-wave fa-3x text-primary mb-3"></i> <!-- Welcome icon -->
+                        <i class="fas fa-hand-wave fa-3x text-primary mb-3"></i>
                         <h4>Welcome to the Chat App!</h4>
                         <p class="text-muted">Select a user from the list to start chatting.</p>
                     </div>
@@ -125,18 +122,9 @@
 {% block extra_js %}
 <script>
     $(document).ready(function() {
-        // --- Chat Message Handling ---
         const chatBox = $('#chat-messages-container');
+        chatBox.scrollTop(chatBox[0].scrollHeight);
 
-        // Function to scroll chat box to the bottom
-        function scrollToBottom() {
-            chatBox.scrollTop(chatBox[0].scrollHeight);
-        }
-
-        // Initial scroll to bottom on page load
-        scrollToBottom();
-
-        // --- Send Message ---
         $('#chat-form').submit(function(e) {
             e.preventDefault();
             const messageInput = $('#message-input');
@@ -159,10 +147,8 @@
                 },
                 success: function(response) {
                     if (response.status === 'success') {
-                        // Clear input field after successful send
                         messageInput.val('');
-                        // Optionally fetch new messages immediately or let polling handle it
-                        // fetchNewMessages(); // Uncomment if you want instant refresh
+                        fetchNewMessages();
                     } else {
                         console.error('Send error:', response);
                         alert('Failed to send message: ' + (response.message || 'Unknown error'));
@@ -175,39 +161,33 @@
             });
         });
 
-        // --- Polling for New Messages ---
         let lastMessageId = 0;
-        // Get the ID of the last message currently displayed
         if (chatBox.children().length > 0) {
              lastMessageId = chatBox.children().last().find('.chat-bubble').data('id') || 0;
         }
 
         function fetchNewMessages() {
-            // Only poll if we are in a chat (chat_id > 0)
             if ({{ chat_id|default:0 }} <= 0) {
                  return;
             }
 
-            const currentLastId = lastMessageId; // Capture the value for this request
+            const currentLastId = lastMessageId;
 
             $.ajax({
-                url: '{% url "chat-renew" %}', // URL for the renew view
+                url: '{% url "chat-renew" %}',
                 type: 'POST',
                 data: {
-                    'last_id': currentLastId, // Send the last known message ID
-                    'chat_id': {{ chat_id|default:0 }}, // Send the current chat partner ID
-                    'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val() // CSRF token
+                    'last_id': currentLastId,
+                    'chat_id': {{ chat_id|default:0 }},
+                    'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
                 },
                 dataType: 'json',
-                timeout: 5000, // Set a timeout for the request (5 seconds)
+                timeout: 5000,
                 success: function(newMessages) {
-                    // Check if new messages were received
                     if (newMessages.length > 0) {
                         let messagesHtml = '';
-                        // Iterate through the new messages
                         newMessages.forEach(function(msg) {
                             let bubbleClass, alignClass;
-                            // Determine if the message was sent by the current user
                             if (msg.user_from == {{ request.user.id }}) {
                                 bubbleClass = 'sent';
                                 alignClass = 'justify-content-end';
@@ -215,7 +195,6 @@
                                 bubbleClass = 'received';
                                 alignClass = 'justify-content-start';
                             }
-                            // Construct the HTML for the new chat bubble
                             messagesHtml += `
                                 <div class="d-flex ${alignClass} mb-2">
                                     <div class="chat-bubble ${bubbleClass}" data-id="${msg.id}">
@@ -224,24 +203,18 @@
                                     </div>
                                 </div>
                             `;
-                            // Update the lastMessageId to the highest ID seen
                             if (msg.id > lastMessageId) {
                                  lastMessageId = msg.id;
                             }
                         });
-                        // Append the new messages to the chat container
                         $('#chat-messages-container').append(messagesHtml);
-                        // Scroll to the bottom only if the user is already near the bottom
-                        // This prevents jumping if the user is reading older messages
-                        const isScrolledToBottom = chatBox[0].scrollHeight - chatBox[0].clientHeight <= chatBox.scrollTop() + 10; // Small buffer
+                        const isScrolledToBottom = chatBox[0].scrollHeight - chatBox[0].clientHeight <= chatBox.scrollTop() + 10;
                         if(isScrolledToBottom) {
-                             scrollToBottom();
+                             chatBox.scrollTop(chatBox[0].scrollHeight);
                         }
                     }
                 },
                 error: function(xhr, status, error) {
-                    // Handle errors silently or with less intrusive logging
-                    // This prevents console spam when there are no new messages (404s, timeouts)
                     if (status !== 'timeout' && xhr.status !== 404) {
                          console.log('Polling error (might be normal):', status, error);
                     }
@@ -249,20 +222,11 @@
             });
         }
 
-        // Start polling for new messages every 2.5 seconds
         const pollingInterval = setInterval(fetchNewMessages, 2500);
 
-        // Clear the polling interval when the window is about to unload
-        // (e.g., user navigates away or closes the tab)
         $(window).on('beforeunload', function() {
             clearInterval(pollingInterval);
         });
-
-        // Optional: Stop polling if navigating away via specific links (like logout)
-        // You might need more sophisticated logic for SPA-like behavior
-        // $('a[href*="logout"]').on('click', function() {
-        //     clearInterval(pollingInterval);
-        // });
 
     });
 </script>
