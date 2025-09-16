@@ -22,9 +22,9 @@ A real-time chat application built with Django. This project includes user authe
 
 | Login Page                                     | Register Page                                      |
 | ---------------------------------------------- | -------------------------------------------------- |
-|           |            |
-| **Chat Page** | **Profile Page** |
-|            |             |
+| ![Login Page](screenshots/login.png)           | ![Register Page](screenshots/register.png)         |
+| **Chat Page**                                  | **Profile Page**                                   |
+| ![Chat Page](screenshots/chat.png)             | ![Profile Page](screenshots/profile.png)           |
 
 ## Getting Started
 
